@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulador EMDR</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+      font-family: sans-serif;
+    }
+    #ball {
+      width: 20px;
+      height: 20px;
+      background: #00ffcc;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      display: flex;
+      gap: 10px;
+    }
+    input[type="range"] {
+      width: 150px;
+    }
+    #thought {
+      margin-bottom: 20px;
+      width: 300px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <input id="thought" type="text" placeholder="Digite o pensamento ou foco...">
+  <div id="ball"></div>
+
+  <div class="controls">
+    <button onclick="toggle()">Iniciar / Pausar</button>
+    <label>Velocidade: <input type="range" id="speedControl" min="1" max="20" value="4"></label>
+  </div>
+
+  <script>
+    const ball = document.getElementById("ball");
+    const speedControl = document.getElementById("speedControl");
+    let running = false;
+    let x = 0;
+    let direction = 1;
+    let speed = parseInt(speedControl.value);
+
+    // Sons alternados
+    const soundLeft = new Audio('https://www.soundjay.com/button/beep-07.wav');
+    const soundRight = new Audio('https://www.soundjay.com/button/beep-08.wav');
+
+    speedControl.addEventListener("input", () => {
+      speed = parseInt(speedControl.value);
+    });
+
+    function playSound(side) {
+      if (side === 'left') {
+        soundLeft.play();
+      } else {
+        soundRight.play();
+      }
+    }
+
+    function moveBall() {
+      if (!running) return;
+      const screenWidth = window.innerWidth;
+      x += speed * direction;
+
+      // Alterna entre esquerda e direita a cada ciclo
+      if (x > screenWidth - 20 || x < 0) {
+        direction *= -1;
+      }
+
+      ball.style.left = x + "px";
+      playSound(direction === 1 ? 'right' : 'left'); // Toca o som alternado
+      requestAnimationFrame(moveBall);
+    }
+
+    function toggle() {
+      running = !running;
+      if (running) moveBall();
+    }
+  </script>
+</body>
+</html>
